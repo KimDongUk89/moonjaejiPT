@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='utf-8'>
+	<meta http-equiv='X-UA-Compatible' content='IE=edge'>
+	<title>Flask Kakao OAuth App</title>
+	<meta name='viewport' content='width=device-width, initial-scale=1'>
+	<!-- <link rel='stylesheet' type='text/css' media='screen' href='/static/style.css'> -->
+</head>
+<body>
+	<!-- 카카오 로그인 api -->
+	<div class="Wrapper">
+		<a id="kakao-login-link" href="#"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFQOJtNpYFKTS1T5QdhIDFFgLzQO93BuFjFw&usqp=CAU" style="height:60px;width:auto;" /></a>
+		<script src = "https://developers.kakao.com/sdk/js/kakao.js"></script>
+		<script>
+			window.Kakao.init("4620daa746ed1a3290f00b43f70095eb");
+
+			document.getElementById('kakao-login-link').addEventListener('click', function(e) {
+				e.preventDefault(); // 링크 클릭 시 기본 동작 방지
+				
+				// 로그인하고 정보를 db에 저장하기 위해 user_register로 이동
+				var form = document.createElement('form');
+				form.method = 'POST';
+				form.action = '/user_register';
+
+				Kakao.Auth.loginForm({
+					scope: 'profile_nickname, profile_image, account_email',
+					success: function(){
+						Kakao.API.request({
+							url:'/v2/user/me',
+							success:function(authObj){
+								// profile 정보 넘겨주기(form 으로 만들어서 post형식으로 보내기)
+								var profiles = [
+									{name : "name", value:authObj.kakao_account.profile.nickname},
+									{name : "email", value:authObj.kakao_account.email},
+									{name : "profile_image_url", value:authObj.kakao_account.profile.profile_image_url},
+									{name : "thumbnail_image_url", value:authObj.kakao_account.profile.thumbnail_image_url},
+								];
+
+								profiles.forEach(function(profile) {
+									var input = document.createElement('input');
+									input.type = 'hidden';
+									input.name = profile.name;
+									input.value = profile.value;
+									form.appendChild(input);
+								});
+
+								document.body.appendChild(form);
+								form.submit();
+
+								// 다른 html로 변수 전달
+								var profile2html = {
+									"name" : authObj.kakao_account.profile.nickname,
+									"email" : authObj.kakao_account.email,
+									"profile_image_url" : authObj.kakao_account.profile.profile_image_url,
+									"thumbnail_image_url" : authObj.kakao_account.profile.thumbnail_image_url
+								}
+								localStorage.setItem("profile", JSON.stringify(profile2html));
+							}
+						})
+					},
+					fail: function(error){
+						console.log(error);
+					}
+				});
+			});
+		</script>
+	</div>
+
+	<div id="loading" class="loading display_none">
+		<div class="loading_circle"></div>
+	</div>
+</body>
+<!-- <script src='/static/main.js'></script> -->
+</html>

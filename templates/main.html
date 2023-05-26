@@ -1,0 +1,82 @@
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>안녕하세요!</h1>
+    <h3>
+        <script>
+            // profile 변수 값 가져오기
+            const profile = JSON.parse(localStorage.getItem("profile"));
+            
+            document.write(profile.name);
+            
+            var imageUrl = profile.thumbnail_image_url;
+            var imgElement = document.createElement('img');
+            imgElement.src = imageUrl;
+            document.body.appendChild(imgElement);
+        </script>
+    님</h3>
+    
+    <!-- 로그아웃 -->
+    <button id="kakao-logout-btn">로그아웃</button>
+    <script src = "https://developers.kakao.com/sdk/js/kakao.js"></script>
+    <script>
+        window.Kakao.init("4620daa746ed1a3290f00b43f70095eb");
+
+        document.getElementById('kakao-logout-btn').addEventListener('click', function() {
+            if (!Kakao.Auth.getAccessToken()) {
+                console.log('Not logged in.');
+                return;
+            }
+
+            Kakao.Auth.logout(function() {
+                location.replace('/');
+            });
+        });
+        
+    </script>
+
+    <div>
+        <!-- 생성된 문서 목록 -->
+        <form id="docForm" action="">
+            <p>
+                문제 목록
+    
+                {% for document in data%}
+                
+                <li><a href="{{ url_for('print_summary', document_id = document['_id']) }}">{{ document['summary'][:20] }}</a></li>
+                {% endfor %}
+            </p>
+        </form>
+
+    </div>
+
+
+
+    <!-- 문제 생성 -->
+    <p>
+        <form action="/doc/" method="post" enctype="multipart/form-data">
+            <p><textarea name="doc" id="" cols="30" rows="10" placeholder="Text"></textarea></p>
+            <p><input type="file" accept=".pdf" name="file" ></p>
+
+            <p>
+                <input type="checkbox" name="multiple choice">객관식
+                <input type="checkbox" name="single term answer">단답형
+                <input type="checkbox" name="fill-in-the-blank">빈칸문제
+                <input type="checkbox" name="true or false">참/거짓
+            </p>
+            <input type="submit" value="답변받기">
+        </form>
+    </p>
+
+    
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,67 @@
+요약
+이 문서는 자동 접속 설정 (비밀번호 입력 생략)에 대한 설명이다. 위 세가지 단계로 요약된다. 첫번째로 로컬에서 ssh-key를 발급받고, 두번째로 발급된 ssh-key파일을 서버에 등록한다. 이후 config 파일에서 키파일을 인식하도록 설정하는 것으로 마무리된다. 이렇게 설정하면 vscode에서 비밀번호를 따로 입력하지 않아도 등록해둔 서버에 바로 접속이 가능하다.
+
+MULTIPLE CHOICE 문제 생성 시작
+1. 자동 접속 설정을 위해 필요한 과정은 몇 단계인가요?
+a) 1단계
+b) 2단계
+c) 3단계
+d) 4단계
+
+2. 로컬에서 ssh-key를 발급 받는 데 사용되는 명령어는 무엇인가요?
+a) ssh-keygen -t rsa -b 4096
+b) ssh-gen -t rsa -b 4096
+c) ssh-key -t rsa -b 4096
+d) ssh-makekey -t rsa -b 4096
+
+3. ssh-key 파일을 서버에 등록할 때, 어떤 파일에 내용을 붙여넣어야 하나요?
+a) id_rsa 파일
+b) config 파일
+c) authorized_keys 파일
+d) ssh_key 파일
+
+4. config 파일에서 어떤 내용을 추가해야 비밀번호 없이 서버에 접속할 수 있게 될까요?
+a) IdentityFile ~/.ssh/id_rsa
+b) IdentityPassword ~/.ssh/id_rsa
+c) IdentityKey ~/.ssh/id_rsa
+d) IdentityAuth ~/.ssh/id_rsa
+
+5. 자동 접속 설정을 위해 필요한 ssh-key 발급 후의 과정 중, 어떤 명령어를 사용해 키 파일의 내용을 확인할까요?
+a) ssh-keygen -t rsa -b 4096
+b) Get-Content .\.ssh\id_rsa.pub
+c) ssh-add ~/.ssh/id_rsa
+d) ssh-copy-id username@host
+MULTIPLE CHOICE 문제 생성 끝
+답 생성
+1. c) 3단계
+2. a) ssh-keygen -t rsa -b 4096
+3. c) authorized_keys 파일
+4. a) IdentityFile ~/.ssh/id_rsa
+5. b) Get-Content .\.ssh\id_rsa.pub
+SINGLE TERM ANSWER 문제 생성 시작
+무엇을 설정해야 비밀번호 입력을 생략하고 자동으로 접속할 수 있는가?
+SINGLE TERM ANSWER 문제 생성 끝
+답 생성
+이 질문에 대한 정답은 다음과 같습니다: 자동 로그인 기능을 설정해야 비밀번호 입력을 생략하고 자동으로 접속할 수 있습니다.
+FILL-IN-THE-BLANK 문제 생성 시작
+1. 자동 접속 설정에서 ssh-key를 발급하는 명령어는 무엇인가요? ( ________ -t rsa -b 4096)
+2. 발급받은 ssh-key 파일을 어떤 파일에 붙여넣기 해야 서버에 인식될까요? (_________ 파일)
+3. config 파일에서 키파일을 인식하도록 설정할 때, 추가해야 하는 정보는 무엇인가요? (IdentityFile ____________________)
+FILL-IN-THE-BLANK 문제 생성 끝
+답 생성
+1. ssh-keygen -t rsa -b 4096
+2. ~/.ssh/authorized_keys (또는 공개키를 붙여넣을 서버의 authorized_keys 파일)
+3. IdentityFile [path/to/private/key] (예: IdentityFile ~/.ssh/id_rsa)
+TRUE OR FALSE 문제 생성 시작
+1. ssh-key를 발급받기 위해 Windows PowerShell에서 ssh-keygen -t rsa -b 4096을 입력해야 한다. (True or False)
+2. ssh-key 발급 후 로컬 환경에서 Get-Content .\.ssh\id_rsa.pub를 입력해 키 파일의 내용을 확인할 수 있다. (True or False)
+3. 발급된 ssh-key파일을 서버에 등록하기 위해서는 .ssh 폴더 안의 authorized_keys 파일에 복사한 내용을 붙여넣기 하면 된다. (True or False)
+4. config 파일에서 키파일을 인식하도록 설정할 때, IdentityFile ~/.ssh/id_rsa를 추가해주면 된다. (True or False)
+5. ssh-key를 인식하고자 하는 서버 정보에 IdentityFile이 입력되어 있어도 비밀번호를 입력해야만 서버에 접속할 수 있다. (True or False)
+TRUE OR FALSE 문제 생성 끝
+답 생성
+1. True
+2. True
+3. True
+4. True
+5. False
