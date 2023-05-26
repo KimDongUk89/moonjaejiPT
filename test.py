@@ -1,6 +1,10 @@
-import pdftotext
+from urllib.request import urlopen
+from flask import request
+from bs4 import BeautifulSoup
+import ssl
 
-file = open('myflask/files/02Graphics+Systems+and+Models.pdf', 'rb')
-fileReader = pdftotext.PDF(file)
+ssl._create_default_https_context = ssl._create_unverified_context
 
-print(fileReader[5])
+url = request.form.get('url')
+html = urlopen(url)
+bsObject = BeautifulSoup(html, "html.parser")

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>문제생성</h2>
+    <!-- 문제 생성 -->
+    <p>
+        <form action="/doc/" method="post" enctype="multipart/form-data">
+            <h3>텍스트</h3>
+            <p><textarea name="doc" id="" cols="30" rows="10" placeholder="Text"></textarea></p>
+            <h3>파일</h3>
+            <p><input type="file" accept=".pdf" name="file" ></p>
+            <h3>URL</h3>
+            <p><input type="url" name="url" placeholder="URL"></p>
+
+
+            <p>
+                <input type="checkbox" name="multiple choice">객관식
+                <input type="checkbox" name="single term answer">단답형
+                <input type="checkbox" name="fill-in-the-blank">빈칸문제
+                <input type="checkbox" name="true or false">참/거짓
+            </p>
+            <input type="submit" value="답변받기">
+        </form>
+    </p>
+
+    <div>
+        <form action="/main/" method="post" enctype="multipart/form-data">
+        
+            <input type="submit" value="홈으로">
+        </form>
+    </div>
+
+
+    
+</body>
+</html>

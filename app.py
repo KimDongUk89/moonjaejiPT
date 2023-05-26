@@ -28,7 +28,12 @@ def home():
     
     return render_template('main.html', data=data)
 
-# 문서 전달 중간 페이지
+# 문제 생성 페이지
+@app.route('/create/')
+def create():
+    return render_template('create.html')
+
+# 문서 처리 페이지
 @app.route('/doc/', methods=['POST'])
 def document():
     return Doc().doc(user=session.get('now_user_email'))

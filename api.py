@@ -5,7 +5,7 @@ import uuid
 import re
 
 # openai api key
-openai.api_key = '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'
+openai.api_key = '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'
 
 def gpt(text,user,types):
     question_list = []

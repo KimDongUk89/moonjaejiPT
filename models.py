@@ -3,6 +3,7 @@ from app import db
 from api import gpt
 import os
 from FileReader import file_read
+from URLReader import url_read
 
 class User():
     def user_register(self):
@@ -41,18 +42,20 @@ class Doc():
                 types.append(i.upper())
 
         # 텍스트로 직접 입력한거 읽기
-        text = request.form['doc']
+        if request.form['doc']:
+            text = request.form['doc']
 
         # 파일 입력한다면
         if request.files['file']:
-            file_read(user, types)
+            text = file_read()
+        
+        # URL 입력한다면
+        if request.form.get('url'):
+            text = url_read()
 
-        # 입력값이 있을 때만 실행
-        if text=='':
-            print("아무것도 없다")
-            return redirect('/main/')
-        else:
-            gpt(text,user,types)
+        # 입력된 내용을 가지고 ChatGPT에 문제 생성 요청
+        gpt(text,user,types)
+
         now_doc_id = session.get('now_doc_id')
         target_url = url_for('print_summary', document_id = now_doc_id)
         return redirect(target_url)
