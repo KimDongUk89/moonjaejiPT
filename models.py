@@ -22,7 +22,7 @@ class User():
         update_data = {"$set" : {"name" : data["name"], "profile_image_url" : data["profile_image_url"], "thumbnail_image_url" : data["thumbnail_image_url"]}}
 
         result = db.user.update_one(filter_query, update_data)
-
+        print("back : ", data)
         if result.matched_count == 0:
             db.user.insert_one(data)
             print("data inserted")
@@ -53,9 +53,16 @@ class Doc():
         if request.form.get('url'):
             text = url_read()
 
+        print("text:",text)
         # 입력된 내용을 가지고 ChatGPT에 문제 생성 요청
         gpt(text,user,types)
 
         now_doc_id = session.get('now_doc_id')
         target_url = url_for('print_summary', document_id = now_doc_id)
         return redirect(target_url)
+
+    def doc_delete(document_id):
+        db.summaries.delete_one({'_id' : document_id})
+        db.questions.delete_many({'doc_id' : document_id})
+        db.answers.delete_many({'doc_id' : document_id})
+        return redirect('/main')

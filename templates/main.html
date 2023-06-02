@@ -51,7 +51,12 @@
     
                 {% for document in data%}
                 
-                <li><a href="{{ url_for('print_summary', document_id = document['_id']) }}">{{ document['summary'][:20] }}</a></li>
+                <li>
+                    <a href="{{ url_for('print_summary', document_id = document['_id']) }}">{{ document['summary'][:20] }}</a><br>
+                    <form action="{{ url_for('doc_delete', document_id = document['_id']) }}" method="post" enctype="multipart/form-data">
+                        <input type="submit" value="문서 삭제">
+                    </form>
+                </li>
                 {% endfor %}
             </p>
         </form>

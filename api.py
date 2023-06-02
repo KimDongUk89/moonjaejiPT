@@ -2,12 +2,13 @@ import openai
 from flask import session
 from app import db
 import uuid
-import re
+import time
 
 # openai api key
-openai.api_key = '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'
+openai.api_key = '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'
 
 def gpt(text,user,types):
+    start = time.time()
     question_list = []
     answer_list = []
     # 요약본 만들기
@@ -25,16 +26,20 @@ def gpt(text,user,types):
     )
 
     summary_msg = res['choices'][0]['message']['content']
-    
+
+    # 요약본(고유 아이디, 생성 주인, 요약본 내용)    
     summary = {
         "_id":uuid.uuid4().hex,
         "owner":user,
         "summary":summary_msg
     }
     
+    # 이 session은 문제와 답을 같은 문서에 대해 불러오기 위함.
+    # 하나의 문서에 하나의 요약본만 존재하므로 요약본의 id를 now_doc_id로 정함.
     session['now_doc_id'] = summary['_id']
-    db.summaries.insert_one(summary)
+    db.summaries.insert_one(summary) # db에 입력
     
+    # 각 문제유형마다 chatGPT한테 문제유형에 맞는 문제 생성 요청
     for question_type in types:
         
         test_list = [{
@@ -62,13 +67,14 @@ def gpt(text,user,types):
             'content' : question_msg
         })
 
+        # 문제(고유 아이디, 문서 아이디, 생성 주인, 문제 내용)
         question = {
             "_id":uuid.uuid4().hex,
             "doc_id":summary['_id'],
             "owner":user,
             "question":question_msg
         }
-        db.questions.insert_one(question)
+        db.questions.insert_one(question) # db에 입력
         question_list.append(question)
 
         test_list.append({
@@ -81,6 +87,8 @@ def gpt(text,user,types):
             messages=test_list
         )
         answer_msg = res['choices'][0]['message']['content']
+
+        # 답(고유 아이디, 문서 아이디, 문제 아이디, 생성 주인, 답 내용)
         answer={
             "_id":uuid.uuid4().hex,
             "doc_id":summary['_id'],
@@ -89,7 +97,8 @@ def gpt(text,user,types):
             "answer":answer_msg
         }
 
-        db.answers.insert_one(answer)
+        db.answers.insert_one(answer) # db에 입력
         answer_list.append(answer)
-
+    end=time.time()
+    print(f"{end-start:.5f}sec")
     return 

@@ -12,7 +12,6 @@
     
     <p>{{ summary }}</p>
 
-    
     <div class="card">
         <h3>문제</h3>
         <p>{{ questions }}</p>
@@ -25,6 +24,10 @@
     <form action="/main/" method="post" enctype="multipart/form-data">
         
         <input type="submit" value="홈으로">
+    </form>
+
+    <form action="{{ url_for('doc_delete', document_id = document_id) }}" method="post" enctype="multipart/form-data">
+        <input type="submit" value="문서 삭제">
     </form>
 
 </body>
