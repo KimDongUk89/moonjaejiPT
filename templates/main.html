@@ -6,41 +6,19 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Document</title>
 </head>
 <body>
-    <h1>안녕하세요!</h1>
-    <h3>
-        <script>
-            // profile 변수 값 가져오기
-            const profile = JSON.parse(localStorage.getItem("profile"));
-            
-            document.write(profile.name);
-            
-            var imageUrl = profile.thumbnail_image_url;
-            var imgElement = document.createElement('img');
-            imgElement.src = imageUrl;
-            document.body.appendChild(imgElement);
-        </script>
-    님</h3>
     
-    <!-- 로그아웃 -->
-    <button id="kakao-logout-btn">로그아웃</button>
-    <script src = "https://developers.kakao.com/sdk/js/kakao.js"></script>
+    <h3>{{ user_data['name'] }}님</h3>
+    <h3>platform : {{ user_data['platform'] }}</h3>
+    <h3>access_token : {{ user_data['access_token'] }}</h3>
     <script>
-        window.Kakao.init("4620daa746ed1a3290f00b43f70095eb");
-
-        document.getElementById('kakao-logout-btn').addEventListener('click', function() {
-            if (!Kakao.Auth.getAccessToken()) {
-                console.log('Not logged in.');
-                return;
-            }
-
-            Kakao.Auth.logout(function() {
-                location.replace('/');
-            });
-        });
-        
+        var imageUrl = "{{ user_data['thumbnail_image_url'] }}";
+        var imgElement = document.createElement('img');
+        imgElement.src = imageUrl;
+        document.body.appendChild(imgElement);
     </script>
 
     <div>
@@ -48,10 +26,11 @@
         <form id="docForm" action="">
             <p>
                 문제 목록
-    
+
                 {% for document in data%}
                 
                 <li>
+                    
                     <a href="{{ url_for('print_summary', document_id = document['_id']) }}">{{ document['summary'][:20] }}</a><br>
                     <form action="{{ url_for('doc_delete', document_id = document['_id']) }}" method="post" enctype="multipart/form-data">
                         <input type="submit" value="문서 삭제">
@@ -68,9 +47,37 @@
             <button>문제생성</button>
         </form>
     </div>
-
-
     
+    <!-- 로그아웃 -->
+    <button id="logout-btn">로그아웃</button>
+    <script src = "https://developers.kakao.com/sdk/js/kakao.js"></script>
+    <script>
+        window.Kakao.init("4620daa746ed1a3290f00b43f70095eb");
+
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            // kakao 사용자가 로그인한 거라면 카카오 방식으로 로그아웃
+            if (Kakao.Auth.getAccessToken()) {
+                Kakao.Auth.logout(function() {
+                location.replace('/');
+                });
+            } else { // naver 사용자가 로그인한 거라면 네이버 방식으로 로그아웃
+            
+            var naverLogoutUrl = 'https://nid.naver.com/oauth2.0/token?grant_type=delete&client_id=kdEGHsiTcc6y7KcJp8_x&client_secret=7WLpqUuaDg&access_token=' + "{{ user_data['access_token'] }}" + '&service_provider=NAVER';
+            
+            // 네이버는 url로 토큰을 제거하는데, fetch를 사용하면 CORS 문제 발생. 해결하려면 프록시 서버를 열어야함.
+            // 그래서 팝업 창을 열고 url 접속시키고 팝업 창을 닫는 방식으로.
+            var popup = window.open(naverLogoutUrl, 'naverLogout', 'width=400,height=200');
+            
+            setTimeout(function() {
+                if (!popup.closed) {
+                    popup.close();
+                    
+                    // 원래 페이지로 이동
+                    window.location.href = '/';
+                }
+            }, 1000); // 1초 후에 팝업 창을 확인하고 닫기
+        }});
+    </script>
 </body>
 </html>
 {% endblock %}

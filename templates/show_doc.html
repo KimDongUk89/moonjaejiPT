@@ -1,0 +1,57 @@
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>요약</h1>
+    <!-- 요약본 -->
+    <p>{{ summary['summary'] }}</p>
+
+    <h2>채점 횟수 : {{ summary['round'][-1] }}</h2>
+    <h2>점수 변화 : {{ summary['grade'][1:] }}</h2>
+
+    <div class="card">
+        <form action="{{ url_for('scoring', document_id = document_id) }}" method="post" enctype="multipart/form-data">
+            {% for idx in range(questions_count) %}
+            <h3>문제</h3>
+            <p>{{ questions[idx]['question'] }}</p>
+            <h3>정답</h3>
+            <p>{{ answers[idx]['answer'] }}</p>
+            <h3>해설</h3>
+            <p>{{ explanations[idx]['explanation'] }}</p>
+            <h3>지금 상태</h3>
+            <p>{{ answers[idx]['correct'] }}</p>
+            <h3>답 입력</h3>
+            <input type="text" name="{{ answers[idx]['_id'] }}" value="">
+            {% endfor %}
+            
+            <input type="submit" value="채점">
+
+        </form>
+
+        <form action="{{ url_for('reset', document_id = document_id) }}" method="post" enctype="multipart/form-data">
+            <input type="submit" value="리셋">
+        </form>
+
+    </div>
+    <br>
+    
+    <!-- 홈화면으로 이동 버튼 -->
+    <form action="/main/" method="post" enctype="multipart/form-data">
+        
+        <input type="submit" value="홈으로">
+    </form>
+
+    <!-- 문서 삭제 버튼 -->
+    <form action="{{ url_for('doc_delete', document_id = document_id) }}" method="post" enctype="multipart/form-data">
+        <input type="submit" value="문서 삭제">
+    </form>
+
+</body>
+</html>
+{% endblock%}
