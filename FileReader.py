@@ -2,7 +2,7 @@ import pdftotext
 import os
 from flask import request
 
-def file_read():
+def readFile():
     # return 할 텍스트
     text = ''
 

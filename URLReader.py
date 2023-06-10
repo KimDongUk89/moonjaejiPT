@@ -5,7 +5,7 @@ import ssl
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
-def url_read():
+def readURL():
     url = request.form.get('url')
     html = requests.get(url)
     soup = BeautifulSoup(html.text, "html.parser")

@@ -1,12 +1,13 @@
+from types import NoneType
 import openai
-from flask import session
+from flask import session, make_response
 from app import db
 import uuid
 import time
 import re
 
 # openai api key
-openai.api_key = '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'
+openai.api_key = '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'
 
 def gpt(text,user,types):
     start = time.time()
@@ -27,13 +28,14 @@ def gpt(text,user,types):
 
     summary_msg = res['choices'][0]['message']['content']
 
-    # 요약본(고유 아이디, 생성 주인, 요약본 내용, 채점당 점수, 채점횟수)    
+    # 요약본(고유 아이디, 생성 주인, 요약본 내용, 문서 제목, 채점 점수, 채점 상태)    
     summary = {
-        "_id":uuid.uuid4().hex,
+        "_id":uuid.uuid4().hex, 
         "owner":user,
         "summary":summary_msg,
-        "score": ["start"],
-        "round":[0]
+        "title":summary_msg[:20],
+        "score": [],
+        "condition":"unscored"
     }
     
     # 이 session은 문제와 답을 같은 문서에 대해 불러오기 위함.
@@ -42,10 +44,11 @@ def gpt(text,user,types):
     db.summaries.insert_one(summary) # db에 입력
     
 
+    # 각 유형마다의 최소 문제 개수
     question_num = 3
-    print(types)
+
     # 각 문제유형마다 chatGPT한테 문제유형에 맞는 문제 생성 요청
-    # ['MULTIPLE CHOICE', 'SINGLE TERM ANSWER', 'FILL-IN-THE-BLANK', 'TRUE OR FALSE']
+    # types : ['MULTIPLE CHOICE', 'SINGLE TERM ANSWER', 'FILL-IN-THE-BLANK', 'TRUE OR FALSE']
     for question_type in types:
     
         if question_type == 'MULTIPLE CHOICE':
@@ -205,10 +208,7 @@ def gpt(text,user,types):
             messages=messages
         )
         return_data = res['choices'][0]['message']['content']
-        f = open('result.txt', 'a')
-        f.write(return_data)
-        f.write('===========')
-        f.close()
+
         # 데이터를 파싱하기 위한 정규표현식
         question_pattern = re.compile(r'(문제 ?\d+:|^\d+\.\s)([\s\S]*?)(?=답:|정답:)', re.M)
         answer_pattern = re.compile(r'(답:|정답:)([\s\S]*?)(?=해설)', re.M)
@@ -219,30 +219,26 @@ def gpt(text,user,types):
         answers = [answer[1].strip() for answer in re.findall(answer_pattern, return_data)]
         explanations = [explanation.strip() for explanation in re.findall(explanation_pattern, return_data)]
 
-        # 결과 출력
-        print("=================")
-        print("문제유형 : ",question_type)
-        print('Questions:', questions)
-        print('Answers:', answers)
-        print('Explanations:', explanations)
 
         for idx in range(len(questions)):
-            # 문제(고유 아이디, 문서 아이디, 생성 주인, 문제 내용)
+            # 문제(고유 아이디, 문서 아이디, 생성 주인, 문제 내용, 문제 유형, 정답/오답 유무, 메모)
             question = {
                 "_id":uuid.uuid4().hex,
                 "doc_id":summary['_id'],
                 "owner":user,
                 "question":questions[idx],
-                "type":question_type
+                "type":question_type,
+                "condition":"normal",
+                'memo':''
             }
-            # 답(고유 아이디, 문서 아이디, 문제 아이디, 생성 주인, 답 내용, 정답/오답 유무)
+            # 답(고유 아이디, 문서 아이디, 문제 아이디, 생성 주인, 답 내용, )
             answer={
                 "_id":uuid.uuid4().hex,
                 "doc_id":summary['_id'],
                 "question_id":question['_id'],
                 "owner":user,
                 "answer":answers[idx],
-                "condition":"normal"
+                "user_select" : ""
             }
             # 해설(고유 아이디, 문서 아이디, 생성 주인, 해설)
             explanation={
@@ -258,4 +254,7 @@ def gpt(text,user,types):
 
     end=time.time()
     print(f"문서 만드는 데 {end-start:.2f}초 걸린다")
+
+    resp = make_response()
+    resp.set_cookie('now_doc_id', summary['_id'])
     return 

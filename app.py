@@ -1,4 +1,6 @@
+from crypt import methods
 from operator import methodcaller
+from urllib import response
 from flask import Flask, render_template, request, session, jsonify
 import pymongo
 from flask_cors import CORS
@@ -20,10 +22,13 @@ from models import User, Doc
 def index():
     return render_template('index.html')
 
-@app.route('/user_register', methods=['GET','POST'])
-def user_register():
-    return User().user_register()
+# 로그인한 후 로그인한 계정이 db에 있는지 확인
+@app.route('/registerUser', methods=['POST'])
+def registerUser():
+    return User().registerUser()
 
+
+# 테스트용 html
 @app.route('/main/', methods=['GET','POST'])
 def home():
     # 현재 로그인한 사용자 정보
@@ -31,48 +36,49 @@ def home():
     
     # 현재 로그인한 계정이 생성한 문제 가져오기.
     data = db.summaries.find({"owner" : session.get('now_user_id')})
-    print(type(data))
     
     return render_template('main.html', user_data=user_data,data=data)
 
-# 문제 생성 페이지
+
+# 사용자 프로필이나 사이드바에 올릴 생성된 문서 목록들을 위함.
+@app.route('/getUserdata', methods=['GET'])
+def getUserdata():
+    user_id = request.cookies.get('user_id')
+    return User.getUserdata(user_id)
+
+# 문제 생성 페이지(테스트용)
 @app.route('/create/')
 def create():
     return render_template('create.html')
 
 # 문서 처리 페이지
-@app.route('/create_doc/', methods=['POST'])
+@app.route('/createDoc/', methods=['POST'])
 def document():
-    return Doc().create_doc(user=session.get('now_user_id'))
+    return Doc().createDoc(user=request.cookies.get('user_id'))
 
 # 요약, 문제 출제 페이지
-@app.route('/show_doc/<document_id>', methods=['GET'])
-def print_summary(document_id):
-    
-    summary = db.summaries.find({"_id" : document_id})[0]
-    
-    questions = db.questions.find({"doc_id" : document_id})
-    
-    answers = db.answers.find({"doc_id" : document_id})
-    explanations = db.explanations.find({"doc_id" : document_id})
-    
-    questions_count = db.questions.count_documents({'doc_id' : document_id})
-    
-    return render_template('show_doc.html', summary=summary, questions=questions, answers=answers, explanations=explanations, document_id=document_id, questions_count=questions_count)
+@app.route('/show/<document_id>', methods=['GET'])
+def show(document_id):
+    return Doc.show(document_id=document_id)
 
 # 문서 삭제
-@app.route('/doc_delete/<document_id>', methods=['POST'])
-def doc_delete(document_id):
-    return Doc.doc_delete(document_id = document_id)
+@app.route('/delete/<document_id>', methods=['GET'])
+def delete(document_id):
+    return Doc.delete(document_id = document_id)
 
 # 채점
-@app.route('/scoring/<document_id>', methods=['POST'])
-def scoring(document_id):
-    answers_dict = request.form.to_dict()
-    print(answers_dict)
-    return Doc.scoring(document_id, answers_dict)
+@app.route('/score', methods=['POST'])
+def score():
+    user_select = request.get_json()
+    return Doc.score(user_select["packages"])
 
 # 리셋
-@app.route('/reset/<document_id>', methods=['POST'])
+@app.route('/reset/<document_id>', methods=['GET'])
 def reset(document_id):
     return Doc.reset(document_id)
+
+# 사용자 입력 값 저장
+@app.route('/save', methods=['POST'])
+def save():
+    user_select = request.get_json()
+    return Doc.save(user_select)
