@@ -1,12 +1,10 @@
 import requests
-from flask import request
 from bs4 import BeautifulSoup
 import ssl
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
-def readURL():
-    url = request.form.get('url')
+def readURL(url):
     html = requests.get(url)
     soup = BeautifulSoup(html.text, "html.parser")
     text = ''
@@ -14,3 +12,5 @@ def readURL():
     for p_tag in soup.find_all('p'):
         text += p_tag.get_text()
     return text
+
+

@@ -1,13 +1,12 @@
-from types import NoneType
 import openai
-from flask import session, make_response
 from app import db
 import uuid
 import time
 import re
 
 # openai api key
-openai.api_key = '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'
+openai.api_key = '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'
+
 
 def gpt(text,user,types):
     start = time.time()
@@ -38,9 +37,7 @@ def gpt(text,user,types):
         "condition":"unscored"
     }
     
-    # 이 session은 문제와 답을 같은 문서에 대해 불러오기 위함.
     # 하나의 문서에 하나의 요약본만 존재하므로 요약본의 id를 now_doc_id로 정함.
-    session['now_doc_id'] = summary['_id']
     db.summaries.insert_one(summary) # db에 입력
     
 
@@ -62,7 +59,7 @@ def gpt(text,user,types):
                 \
                 Here are format guides. \
                 \
-                Read given {text} and give {question_type} questions that will appear on the exam. \
+                Read given text and give {question_type} questions that will appear on the exam. \
                 The number of multiple choice questions is four. \
                 DO NOT MISS EVEN ONE THING.  \
                 Do not specify question type on the beginning.   \
@@ -106,7 +103,7 @@ def gpt(text,user,types):
                 question types: {question_type}. text: {text}. \
                 \
                 Here are format guides. \
-                Read given {text} and give {question_type} questions that will appear on the exam. \
+                Read given text and give {question_type} questions that will appear on the exam. \
                 The number of multiple choice questions is four. \
                 Give me ALL TYPE OF {question_type} questions. DO NOT MISS EVEN ONE THING.  \
                 Do not specify question type on the beginning.   \
@@ -142,7 +139,7 @@ def gpt(text,user,types):
                 question types: {question_type}. text: {text}. \
                 \
                 Here are format guides. \
-                Read given {text} and give {question_type} questions that will appear on the exam. \
+                Read given text and give {question_type} questions that will appear on the exam. \
                 The number of multiple choice questions is four. \
                 Give me ALL TYPE OF {question_type} questions. DO NOT MISS EVEN ONE THING.  \
                 Do not specify question type on the beginning.   \
@@ -178,7 +175,7 @@ def gpt(text,user,types):
                 question types: {question_type}. text: {text}. \
                 \
                 Here are format guides. \
-                Read given {text} and give {question_type} questions that will appear on the exam. \
+                Read given text and give {question_type} questions that will appear on the exam. \
                 The number of multiple choice questions is four. \
                 Give me ALL TYPE OF {question_type} questions. DO NOT MISS EVEN ONE THING.  \
                 Do not specify question type on the beginning.   \
@@ -255,6 +252,4 @@ def gpt(text,user,types):
     end=time.time()
     print(f"문서 만드는 데 {end-start:.2f}초 걸린다")
 
-    resp = make_response()
-    resp.set_cookie('now_doc_id', summary['_id'])
-    return 
+    return summary['_id']

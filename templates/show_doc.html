@@ -8,13 +8,17 @@
     <title>Document</title>
 </head>
 <body>
+    <!-- 채점 결과 -->
+    <!-- {% for i in summary['score'] %}
+    <h3>채점 결과 : {{ i }}</h3>
+    {% endfor %}
+     -->
+
     <h1>요약</h1>
     <!-- 요약본 -->
     <p>{{ summary['summary'] }}</p>
 
-    <h2>채점 횟수 : {{ summary['round'][-1] }}</h2>
-    <h2>점수 변화 : {{ summary['grade'][1:] }}</h2>
-
+    
     <div class="card">
         <form action="{{ url_for('score', document_id = document_id) }}" method="post" enctype="multipart/form-data">
             {% for idx in range(questions_count) %}

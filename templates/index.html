@@ -71,10 +71,10 @@
 
 	<!-- 네이버 로그인 -->
 	<script type="text/javascript">
-		var naver_id_login = new naver_id_login("kdEGHsiTcc6y7KcJp8_x", "http://127.0.0.1:5000/");
+		var naver_id_login = new naver_id_login("kdEGHsiTcc6y7KcJp8_x", "http://192.168.0.43:5000/");
 		var state = naver_id_login.getUniqState();
 		naver_id_login.setButton("green", 3,60);
-		naver_id_login.setDomain("http://127.0.0.1:5000/");
+		naver_id_login.setDomain("http://192.168.0.43:5000");
 		naver_id_login.setState(state);
 		// naver_id_login.setPopup(); 새로운 창을 띄우지 말고 하자.
 		naver_id_login.init_naver_id_login();

@@ -1,13 +1,10 @@
 import pdftotext
 import os
-from flask import request
 
-def readFile():
+def readFile(file):
     # return 할 텍스트
-    text = ''
-
     # 파일 받아와서 저장
-    file = request.files['file']
+    text = ''
     file_name=file.filename
     os.makedirs('./files', exist_ok=True)
     FILEPATH = os.path.join('./files',file_name)
